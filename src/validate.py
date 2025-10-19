@@ -1,6 +1,8 @@
-import mlflow
 import json
 import os
+
+import mlflow
+
 mlflow.set_tracking_uri("ruta/mlruns")
 experiment = mlflow.get_experiment_by_name("ci-cd-mlflow-local")
 runs = mlflow.search_runs(experiment.experiment_id, order_by=["start_time DESC"])
