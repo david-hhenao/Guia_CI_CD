@@ -10,6 +10,10 @@ install:
 
 # Formateo (puedes empezar con check para no reescribir código en CI)
 format:
+	black .
+	isort .
+
+format-check:
 	black --check .
 	isort --check-only .
 
@@ -19,8 +23,12 @@ train:
 validate:
 	python src/validate.py
 
+# Aliases para el paso de Actions
+evaluate: validate
+eval: evaluate
+
 # ci: install train validate
-ci: install format train evaluate
+ci: install format-check train evaluate
 
 cd:
 	@echo "Aquí iría el comando de promoción o despliegue del modelo"
