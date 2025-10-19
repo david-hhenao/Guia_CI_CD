@@ -1,30 +1,30 @@
-name: Continuous Integration
+name: CI - Entrenamiento y Validación de Modelo
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [main]
   workflow_dispatch:
-  
-permissions: write-all
 jobs:
-  build:
+  train-and-validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: iterative/setup-cml@v2
-      - name: Install Packages
-        run: make install
-      - name: Format
-        run: make format
-      - name: Train
-        run: make train
-      - name: Evaluation
-        env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: make eval
-      - name: Update Branch
-        env:
-          NAME: ${{ secrets.USER_NAME }}
-          EMAIL: ${{ secrets.USER_EMAIL }}
-        run: make update-branch USER_NAME=$NAME USER_EMAIL=$EMAIL
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements.txt
+      - name: Entrenar modelo
+        run: |
+          mkdir -p ruta/mlruns
+          python src/train.py
+      - name: Validar modelo
+        run: |
+          python src/validate.py
+      - name: Subir artefactos (tracking local)
+        uses: actions/upload-artifact@v4
+        with:
+          name: mlruns
+          path: ruta/mlruns
