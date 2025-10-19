@@ -1,30 +1,26 @@
-name: CI - Entrenamiento y Validación de Modelo
+# .github/workflows/ci.yml
+name: CI
 on:
   push:
     branches: [main]
-  workflow_dispatch:
+  pull_request:
+
 jobs:
-  train-and-validate:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Clonar el repositorio
-        uses: actions/checkout@v3
-      - name: Configurar Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-      - name: Instalar dependencias
-        run: |
-          pip install -r requirements.txt
-      - name: Entrenar modelo
-        run: |
-          mkdir -p ruta/mlruns
-          python src/train.py
-      - name: Validar modelo
-        run: |
-          python src/validate.py
-      - name: Subir artefactos (tracking local)
-        uses: actions/upload-artifact@v4
+          python-version: "3.10"
+          cache: "pip"
+
+      - run: make install
+      - run: make format-check   # o 'make format' si quieres autoformatear
+      - run: make train
+      - run: make evaluate
+
+      - uses: actions/upload-artifact@v4
         with:
           name: mlruns
-          path: ruta/mlruns
+          path: mlruns
